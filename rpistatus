@@ -1,2 +1,30 @@
-blank
+#!/bin/bash
 
+
+ifresult="$(ifconfig)"
+broadcastres1="${ifresult#*broadcast}"
+broadcastres2="${broadcastres1%%inet*}"
+
+pingcount=2
+rpis=( "rpi01" "rpi02" "rpi03" "rpi04" "rpi05" "rpi06" "rpi07" "rpi08" "rpi09" "rpi10" "rpi11" "rpi12" "rpi13" "rpi14" "rpi15" "rpi16" "rpi17" "rpi18" "rpi19" "rpi20")
+
+for i in ${rpis[@]}
+do
+        :
+        pingres="$(ping -q -c$pingcount $i)"
+        croppedstring="$(echo $pingres | sed -n -e 's/^.*transmitted, //p')"
+        croppedstring2="$(echo $croppedstring | cut -f1 -d'r')"
+        if [ $? -eq 0 ]
+        then
+                if [ "$(($croppedstring2))" -gt 0 ]
+                then
+                        echo "$i : alive"
+                else
+                        echo "$i : dead"
+                fi
+        else
+                echo "$i : dead"
+        fi
+done
+
+exit 0
